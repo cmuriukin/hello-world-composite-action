@@ -35,7 +35,7 @@ runs:
           -Dsonar.projectName=$INPUT_PROJECT-NAME \
           -Dsonar.projectVersion=$INPUT_PROJECT-VERSION \
           -Dsonar.sources=$INPUT_SOURCES \
-          -Dsonar.host.url=https://sonarcloud.io
+          -Dsonar.host.url=http://18.170.57.68:9000
       env:
         INPUT_SONAR-TOKEN: ${{ inputs.sonar-token }}
         INPUT_PROJECT-KEY: ${{ inputs.project-key }}
