@@ -1,45 +1,55 @@
-name: SonarQube Analysis
+name: SonarQube Scan
 
-description: |
-  This composite action runs a SonarQube analysis on a project.
+description: Runs a SonarQube scan on the codebase and reports the results.
 
 inputs:
   sonar-token:
-    description: 'The SonarQube authentication token.'
+    description: 'The token used to authenticate with SonarQube.'
+    required: true
+  sonar-url:
+    description: 'The URL of the SonarQube server.'
     required: true
   project-key:
-    description: 'The SonarQube project key.'
+    description: 'The unique key of the project in SonarQube.'
     required: true
   project-name:
-    description: 'The SonarQube project name.'
+    description: 'The name of the project being scanned.'
     required: true
   project-version:
-    description: 'The SonarQube project version.'
+    description: 'The version of the project being analyzed.'
     required: true
   sources:
-    description: 'The source code directory to be analyzed.'
+    description: 'The directories or files to be analyzed by SonarQube.'
     required: true
-
 
 runs:
   using: 'composite'
+  shell:  bash
   steps:
     - name: Checkout code
       uses: actions/checkout@v2
 
-    - name: Install SonarQube Scanner
+    - name: Set up Java
+      uses: actions/setup-java@v2
+      with:
+        java-version: '11'
+
+    - name: Download SonarQube Scanner
       run: |
         curl -L https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.6.0.2311-linux.zip -o sonar-scanner.zip
         unzip sonar-scanner.zip
         mv sonar-scanner-4.6.0.2311-linux sonar-scanner
         chmod +x sonar-scanner/bin/sonar-scanner
 
-    - name: Run SonarQube Analysis
+    - name: Run SonarQube Scan
+      env:
+        SONAR_TOKEN: ${{ inputs.sonar-token }}
+        SONAR_HOST_URL: ${{ inputs.sonar-url }}
       run: |
         sonar-scanner/bin/sonar-scanner \
-          -Dsonar.projectKey=$INPUT_PROJECT_KEY \
-          -Dsonar.projectName=$INPUT_PROJECT_NAME \
-          -Dsonar.projectVersion=$INPUT_PROJECT_VERSION \
-          -Dsonar.sources=$INPUT_SOURCES \
-          -Dsonar.host.url=https://your-sonarqube-url.com \
-          -Dsonar.login=$INPUT_SONAR_TOKEN
+          -Dsonar.projectKey=${{ inputs.project-key }} \
+          -Dsonar.projectName="${{ inputs.project-name }}" \
+          -Dsonar.projectVersion=${{ inputs.project-version }} \
+          -Dsonar.sources=${{ inputs.sources }} \
+          -Dsonar.login="${{ inputs.sonar-token }}" \
+          -Dsonar.host.url="${{ inputs.sonar-url }}"
