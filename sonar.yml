@@ -1,0 +1,35 @@
+name: SonarQube Multi Project Analysis
+
+on:
+  push:
+    branches:
+      - main
+jobs:
+  sonarqube:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: SonarQube Analysis
+        uses: ./.github/actions/sonarqube-multi
+        env:
+          PROJECT_LIST: |
+            [
+              {
+                "key": "project-1",
+                "name": "Project 1",
+                "dir": "src/project-1",
+              },
+              {
+                "key": "project-2",
+                "name": "Project 2",
+                "dir": "src/project-2",
+              },
+              {
+                "key": "project-3",
+                "name": "Project 3",
+                "dir": "src/project-3",
+              }
+            ]
+          SONARQUBE_TOKEN: ${{ secrets.SONARQUBE_TOKEN }}
