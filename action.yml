@@ -26,16 +26,10 @@ runs:
     - name: Checkout
       uses: actions/checkout@v2
     - name: SonarQube Scan
-      run: |
-        docker run --rm \
-          -e SONAR_TOKEN=$INPUT_SONAR-TOKEN \
-          -v $(pwd):/usr/src \
-          sonarsource/sonar-scanner-cli:latest \
-          -Dsonar.projectKey=$INPUT_PROJECT-KEY \
-          -Dsonar.projectName=$INPUT_PROJECT-NAME \
-          -Dsonar.projectVersion=$INPUT_PROJECT-VERSION \
-          -Dsonar.sources=$INPUT_SOURCES \
-          -Dsonar.host.url=http://18.170.57.68:9000
+      uses: sonarsource/sonarqube-scan-action@master
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
       env:
         INPUT_SONAR-TOKEN: ${{ inputs.sonar-token }}
         INPUT_PROJECT-KEY: ${{ inputs.project-key }}
